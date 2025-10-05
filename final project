@@ -1,0 +1,734 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "7c0c039c-a2d6-4b70-b467-6432188d94f8",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Requirement already satisfied: yfinance in /opt/conda/lib/python3.12/site-packages (0.2.66)\n",
+      "Requirement already satisfied: pandas>=1.3.0 in /opt/conda/lib/python3.12/site-packages (from yfinance) (2.3.3)\n",
+      "Requirement already satisfied: numpy>=1.16.5 in /opt/conda/lib/python3.12/site-packages (from yfinance) (2.3.3)\n",
+      "Requirement already satisfied: requests>=2.31 in /opt/conda/lib/python3.12/site-packages (from yfinance) (2.32.3)\n",
+      "Requirement already satisfied: multitasking>=0.0.7 in /opt/conda/lib/python3.12/site-packages (from yfinance) (0.0.12)\n",
+      "Requirement already satisfied: platformdirs>=2.0.0 in /opt/conda/lib/python3.12/site-packages (from yfinance) (4.3.6)\n",
+      "Requirement already satisfied: pytz>=2022.5 in /opt/conda/lib/python3.12/site-packages (from yfinance) (2024.2)\n",
+      "Requirement already satisfied: frozendict>=2.3.4 in /opt/conda/lib/python3.12/site-packages (from yfinance) (2.4.6)\n",
+      "Requirement already satisfied: peewee>=3.16.2 in /opt/conda/lib/python3.12/site-packages (from yfinance) (3.18.2)\n",
+      "Requirement already satisfied: beautifulsoup4>=4.11.1 in /opt/conda/lib/python3.12/site-packages (from yfinance) (4.12.3)\n",
+      "Requirement already satisfied: curl_cffi>=0.7 in /opt/conda/lib/python3.12/site-packages (from yfinance) (0.13.0)\n",
+      "Requirement already satisfied: protobuf>=3.19.0 in /opt/conda/lib/python3.12/site-packages (from yfinance) (6.32.1)\n",
+      "Requirement already satisfied: websockets>=13.0 in /opt/conda/lib/python3.12/site-packages (from yfinance) (15.0.1)\n",
+      "Requirement already satisfied: soupsieve>1.2 in /opt/conda/lib/python3.12/site-packages (from beautifulsoup4>=4.11.1->yfinance) (2.5)\n",
+      "Requirement already satisfied: cffi>=1.12.0 in /opt/conda/lib/python3.12/site-packages (from curl_cffi>=0.7->yfinance) (1.17.1)\n",
+      "Requirement already satisfied: certifi>=2024.2.2 in /opt/conda/lib/python3.12/site-packages (from curl_cffi>=0.7->yfinance) (2024.12.14)\n",
+      "Requirement already satisfied: python-dateutil>=2.8.2 in /opt/conda/lib/python3.12/site-packages (from pandas>=1.3.0->yfinance) (2.9.0.post0)\n",
+      "Requirement already satisfied: tzdata>=2022.7 in /opt/conda/lib/python3.12/site-packages (from pandas>=1.3.0->yfinance) (2025.2)\n",
+      "Requirement already satisfied: charset_normalizer<4,>=2 in /opt/conda/lib/python3.12/site-packages (from requests>=2.31->yfinance) (3.4.1)\n",
+      "Requirement already satisfied: idna<4,>=2.5 in /opt/conda/lib/python3.12/site-packages (from requests>=2.31->yfinance) (3.10)\n",
+      "Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/conda/lib/python3.12/site-packages (from requests>=2.31->yfinance) (2.3.0)\n",
+      "Requirement already satisfied: pycparser in /opt/conda/lib/python3.12/site-packages (from cffi>=1.12.0->curl_cffi>=0.7->yfinance) (2.22)\n",
+      "Requirement already satisfied: six>=1.5 in /opt/conda/lib/python3.12/site-packages (from python-dateutil>=2.8.2->pandas>=1.3.0->yfinance) (1.17.0)\n",
+      "Requirement already satisfied: bs4 in /opt/conda/lib/python3.12/site-packages (0.0.2)\n",
+      "Requirement already satisfied: beautifulsoup4 in /opt/conda/lib/python3.12/site-packages (from bs4) (4.12.3)\n",
+      "Requirement already satisfied: soupsieve>1.2 in /opt/conda/lib/python3.12/site-packages (from beautifulsoup4->bs4) (2.5)\n",
+      "Requirement already satisfied: nbformat in /opt/conda/lib/python3.12/site-packages (5.10.4)\n",
+      "Requirement already satisfied: fastjsonschema>=2.15 in /opt/conda/lib/python3.12/site-packages (from nbformat) (2.21.1)\n",
+      "Requirement already satisfied: jsonschema>=2.6 in /opt/conda/lib/python3.12/site-packages (from nbformat) (4.23.0)\n",
+      "Requirement already satisfied: jupyter-core!=5.0.*,>=4.12 in /opt/conda/lib/python3.12/site-packages (from nbformat) (5.7.2)\n",
+      "Requirement already satisfied: traitlets>=5.1 in /opt/conda/lib/python3.12/site-packages (from nbformat) (5.14.3)\n",
+      "Requirement already satisfied: attrs>=22.2.0 in /opt/conda/lib/python3.12/site-packages (from jsonschema>=2.6->nbformat) (25.1.0)\n",
+      "Requirement already satisfied: jsonschema-specifications>=2023.03.6 in /opt/conda/lib/python3.12/site-packages (from jsonschema>=2.6->nbformat) (2024.10.1)\n",
+      "Requirement already satisfied: referencing>=0.28.4 in /opt/conda/lib/python3.12/site-packages (from jsonschema>=2.6->nbformat) (0.36.2)\n",
+      "Requirement already satisfied: rpds-py>=0.7.1 in /opt/conda/lib/python3.12/site-packages (from jsonschema>=2.6->nbformat) (0.22.3)\n",
+      "Requirement already satisfied: platformdirs>=2.5 in /opt/conda/lib/python3.12/site-packages (from jupyter-core!=5.0.*,>=4.12->nbformat) (4.3.6)\n",
+      "Requirement already satisfied: typing-extensions>=4.4.0 in /opt/conda/lib/python3.12/site-packages (from referencing>=0.28.4->jsonschema>=2.6->nbformat) (4.12.2)\n",
+      "Requirement already satisfied: plotly in /opt/conda/lib/python3.12/site-packages (6.3.1)\n",
+      "Requirement already satisfied: narwhals>=1.15.1 in /opt/conda/lib/python3.12/site-packages (from plotly) (2.6.0)\n",
+      "Requirement already satisfied: packaging in /opt/conda/lib/python3.12/site-packages (from plotly) (24.2)\n"
+     ]
+    }
+   ],
+   "source": [
+    "!pip install yfinance\n",
+    "!pip install bs4\n",
+    "!pip install nbformat\n",
+    "!pip install --upgrade plotly"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "fb087db7-ab58-4343-a60d-8870e86089c9",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import yfinance as yf\n",
+    "import pandas as pd\n",
+    "import requests\n",
+    "from bs4 import BeautifulSoup\n",
+    "import plotly.graph_objects as go\n",
+    "from plotly.subplots import make_subplots"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "7d9f5f4b-78f6-419e-8ca9-b98b082b7fd2",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import plotly.io as pio\n",
+    "pio.renderers.default = \"iframe\""
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "4b213e3e-f892-40ad-9b2f-1f4de4868da4",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import warnings\n",
+    "# Ignore all warnings\n",
+    "warnings.filterwarnings(\"ignore\", category=FutureWarning)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "c86897b9-5122-4130-be26-8c810084abb6",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "def make_graph(stock_data, revenue_data, stock):\n",
+    "    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, subplot_titles=(\"Historical Share Price\", \"Historical Revenue\"), vertical_spacing = .3)\n",
+    "    stock_data_specific = stock_data[stock_data.Date <= '2021-06-14']\n",
+    "    revenue_data_specific = revenue_data[revenue_data.Date <= '2021-04-30']\n",
+    "    fig.add_trace(go.Scatter(x=pd.to_datetime(stock_data_specific.Date, infer_datetime_format=True), y=stock_data_specific.Close.astype(\"float\"), name=\"Share Price\"), row=1, col=1)\n",
+    "    fig.add_trace(go.Scatter(x=pd.to_datetime(revenue_data_specific.Date, infer_datetime_format=True), y=revenue_data_specific.Revenue.astype(\"float\"), name=\"Revenue\"), row=2, col=1)\n",
+    "    fig.update_xaxes(title_text=\"Date\", row=1, col=1)\n",
+    "    fig.update_xaxes(title_text=\"Date\", row=2, col=1)\n",
+    "    fig.update_yaxes(title_text=\"Price ($US)\", row=1, col=1)\n",
+    "    fig.update_yaxes(title_text=\"Revenue ($US Millions)\", row=2, col=1)\n",
+    "    fig.update_layout(showlegend=False,\n",
+    "    height=900,\n",
+    "    title=stock,\n",
+    "    xaxis_rangeslider_visible=True)\n",
+    "    fig.show()\n",
+    "    from IPython.display import display, HTML\n",
+    "    fig_html = fig.to_html()\n",
+    "    display(HTML(fig_html))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "89ef7fee-ee45-46ee-afc9-9be47b02bbb7",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "tesla = yf.Ticker(\"TSLA\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 23,
+   "id": "c868c514-0518-4191-b579-7a3c4805daac",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "tesla_data = tesla.history(period=\"max\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "id": "b98123ae-c180-4f7e-9db2-7a95953dfc82",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Open</th>\n",
+       "      <th>High</th>\n",
+       "      <th>Low</th>\n",
+       "      <th>Close</th>\n",
+       "      <th>Volume</th>\n",
+       "      <th>Dividends</th>\n",
+       "      <th>Stock Splits</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Date</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>2010-06-29 00:00:00-04:00</th>\n",
+       "      <td>1.266667</td>\n",
+       "      <td>1.666667</td>\n",
+       "      <td>1.169333</td>\n",
+       "      <td>1.592667</td>\n",
+       "      <td>281494500</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2010-06-30 00:00:00-04:00</th>\n",
+       "      <td>1.719333</td>\n",
+       "      <td>2.028000</td>\n",
+       "      <td>1.553333</td>\n",
+       "      <td>1.588667</td>\n",
+       "      <td>257806500</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2010-07-01 00:00:00-04:00</th>\n",
+       "      <td>1.666667</td>\n",
+       "      <td>1.728000</td>\n",
+       "      <td>1.351333</td>\n",
+       "      <td>1.464000</td>\n",
+       "      <td>123282000</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2010-07-02 00:00:00-04:00</th>\n",
+       "      <td>1.533333</td>\n",
+       "      <td>1.540000</td>\n",
+       "      <td>1.247333</td>\n",
+       "      <td>1.280000</td>\n",
+       "      <td>77097000</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2010-07-06 00:00:00-04:00</th>\n",
+       "      <td>1.333333</td>\n",
+       "      <td>1.333333</td>\n",
+       "      <td>1.055333</td>\n",
+       "      <td>1.074000</td>\n",
+       "      <td>103003500</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                               Open      High       Low     Close     Volume  \\\n",
+       "Date                                                                           \n",
+       "2010-06-29 00:00:00-04:00  1.266667  1.666667  1.169333  1.592667  281494500   \n",
+       "2010-06-30 00:00:00-04:00  1.719333  2.028000  1.553333  1.588667  257806500   \n",
+       "2010-07-01 00:00:00-04:00  1.666667  1.728000  1.351333  1.464000  123282000   \n",
+       "2010-07-02 00:00:00-04:00  1.533333  1.540000  1.247333  1.280000   77097000   \n",
+       "2010-07-06 00:00:00-04:00  1.333333  1.333333  1.055333  1.074000  103003500   \n",
+       "\n",
+       "                           Dividends  Stock Splits  \n",
+       "Date                                                \n",
+       "2010-06-29 00:00:00-04:00        0.0           0.0  \n",
+       "2010-06-30 00:00:00-04:00        0.0           0.0  \n",
+       "2010-07-01 00:00:00-04:00        0.0           0.0  \n",
+       "2010-07-02 00:00:00-04:00        0.0           0.0  \n",
+       "2010-07-06 00:00:00-04:00        0.0           0.0  "
+      ]
+     },
+     "execution_count": 11,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tesla_data.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 34,
+   "id": "23ad1764-9ddc-4fa8-bee8-40857d530b6b",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "url=\"https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-PY0220EN-SkillsNetwork/labs/project/revenue.htm\"\n",
+    "\n",
+    "html_data=requests.get(url).text"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 36,
+   "id": "d22c9845-8ef4-4970-8013-4d6a4f7c6da3",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "soup = BeautifulSoup(html_data)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 38,
+   "id": "b08958db-e0db-4d57-8387-0028fa824e97",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "AttributeError",
+     "evalue": "'DataFrame' object has no attribute 'append'",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[0;31mAttributeError\u001b[0m                            Traceback (most recent call last)",
+      "\u001b[0;32m/tmp/ipykernel_622/303978395.py\u001b[0m in \u001b[0;36m?\u001b[0;34m()\u001b[0m\n\u001b[1;32m      2\u001b[0m \u001b[0;32mfor\u001b[0m \u001b[0mrow\u001b[0m \u001b[0;32min\u001b[0m \u001b[0msoup\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mfind\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"tbody\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mfind_all\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m'tr'\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      3\u001b[0m     \u001b[0mcol\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mrow\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mfind_all\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"td\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      4\u001b[0m     \u001b[0mdate\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mcol\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;36m0\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mtext\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      5\u001b[0m     \u001b[0mRevenue\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mcol\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mtext\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 6\u001b[0;31m     \u001b[0mtesla_revenue\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mtesla_revenue\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mappend\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m{\u001b[0m\u001b[0;34m\"Date\"\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0mdate\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\"Revenue\"\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0mRevenue\u001b[0m\u001b[0;34m}\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mignore_index\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;32mTrue\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      7\u001b[0m     \u001b[0mgme_revenue\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;34m\"Revenue\"\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mgme_revenue\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;34m'Revenue'\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mstr\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mreplace\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m',|\\$'\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\"\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      8\u001b[0m \u001b[0mgme_revenue\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mhead\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m/opt/conda/lib/python3.12/site-packages/pandas/core/generic.py\u001b[0m in \u001b[0;36m?\u001b[0;34m(self, name)\u001b[0m\n\u001b[1;32m   6317\u001b[0m             \u001b[0;32mand\u001b[0m \u001b[0mname\u001b[0m \u001b[0;32mnot\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_accessors\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   6318\u001b[0m             \u001b[0;32mand\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_info_axis\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_can_hold_identifiers_and_holds_name\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mname\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   6319\u001b[0m         \u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   6320\u001b[0m             \u001b[0;32mreturn\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0mname\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 6321\u001b[0;31m         \u001b[0;32mreturn\u001b[0m \u001b[0mobject\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m__getattribute__\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mname\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m",
+      "\u001b[0;31mAttributeError\u001b[0m: 'DataFrame' object has no attribute 'append'"
+     ]
+    }
+   ],
+   "source": [
+    "tesla_revenue=pd.DataFrame(columns=[\"Date\",\"Revenue\"])\n",
+    "for row in soup.find(\"tbody\").find_all('tr'):\n",
+    "    col=row.find_all(\"td\")\n",
+    "    date=col[0].text\n",
+    "    Revenue=col[1].text\n",
+    "    tesla_revenue=tesla_revenue.append({\"Date\":date,\"Revenue\":Revenue}, ignore_index=True)   \n",
+    "    gme_revenue[\"Revenue\"]=gme_revenue['Revenue'].str.replace(',|\\$',\"\")\n",
+    "gme_revenue.head() "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "id": "996ec040-5bf3-4081-aa58-dde8f237c2cc",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "tesla_revenue[\"Revenue\"] = tesla_revenue['Revenue'].str.replace(',|\\$',\"\",regex=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "id": "15b243d1-78c3-48c1-9b98-83ac43b96598",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "tesla_revenue.dropna(inplace=True)\n",
+    "\n",
+    "tesla_revenue = tesla_revenue[tesla_revenue['Revenue'] != \"\"]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "id": "d75a64fa-af23-49f2-b762-7a2f9fb2dc6b",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Date</th>\n",
+       "      <th>Revenue</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "Empty DataFrame\n",
+       "Columns: [Date, Revenue]\n",
+       "Index: []"
+      ]
+     },
+     "execution_count": 17,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "tesla_revenue.tail()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "id": "86b9f152-726a-4ce2-95f7-4f8f82149b2d",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "GameStop = yf.Ticker(\"GME\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 20,
+   "id": "e656dcad-02ac-4aec-9353-ea3a98e62b0d",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "gme_data = GameStop.history(period=\"max\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "id": "c2f65564-4377-4b8b-8f6e-4c0da48cdf70",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Open</th>\n",
+       "      <th>High</th>\n",
+       "      <th>Low</th>\n",
+       "      <th>Close</th>\n",
+       "      <th>Volume</th>\n",
+       "      <th>Dividends</th>\n",
+       "      <th>Stock Splits</th>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>Date</th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "      <th></th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>2002-02-13 00:00:00-05:00</th>\n",
+       "      <td>1.620129</td>\n",
+       "      <td>1.693350</td>\n",
+       "      <td>1.603296</td>\n",
+       "      <td>1.691667</td>\n",
+       "      <td>76216000</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2002-02-14 00:00:00-05:00</th>\n",
+       "      <td>1.712707</td>\n",
+       "      <td>1.716074</td>\n",
+       "      <td>1.670626</td>\n",
+       "      <td>1.683250</td>\n",
+       "      <td>11021600</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2002-02-15 00:00:00-05:00</th>\n",
+       "      <td>1.683251</td>\n",
+       "      <td>1.687459</td>\n",
+       "      <td>1.658002</td>\n",
+       "      <td>1.674834</td>\n",
+       "      <td>8389600</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2002-02-19 00:00:00-05:00</th>\n",
+       "      <td>1.666418</td>\n",
+       "      <td>1.666418</td>\n",
+       "      <td>1.578047</td>\n",
+       "      <td>1.607504</td>\n",
+       "      <td>7410400</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2002-02-20 00:00:00-05:00</th>\n",
+       "      <td>1.615921</td>\n",
+       "      <td>1.662210</td>\n",
+       "      <td>1.603296</td>\n",
+       "      <td>1.662210</td>\n",
+       "      <td>6892800</td>\n",
+       "      <td>0.0</td>\n",
+       "      <td>0.0</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                               Open      High       Low     Close    Volume  \\\n",
+       "Date                                                                          \n",
+       "2002-02-13 00:00:00-05:00  1.620129  1.693350  1.603296  1.691667  76216000   \n",
+       "2002-02-14 00:00:00-05:00  1.712707  1.716074  1.670626  1.683250  11021600   \n",
+       "2002-02-15 00:00:00-05:00  1.683251  1.687459  1.658002  1.674834   8389600   \n",
+       "2002-02-19 00:00:00-05:00  1.666418  1.666418  1.578047  1.607504   7410400   \n",
+       "2002-02-20 00:00:00-05:00  1.615921  1.662210  1.603296  1.662210   6892800   \n",
+       "\n",
+       "                           Dividends  Stock Splits  \n",
+       "Date                                                \n",
+       "2002-02-13 00:00:00-05:00        0.0           0.0  \n",
+       "2002-02-14 00:00:00-05:00        0.0           0.0  \n",
+       "2002-02-15 00:00:00-05:00        0.0           0.0  \n",
+       "2002-02-19 00:00:00-05:00        0.0           0.0  \n",
+       "2002-02-20 00:00:00-05:00        0.0           0.0  "
+      ]
+     },
+     "execution_count": 24,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "gme_data.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 25,
+   "id": "4d70ca53-6e8a-4bc5-9571-88b91de0740f",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "url = \"https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-PY0220EN-SkillsNetwork/labs/project/stock.html\"\n",
+    "\n",
+    "html_data  = requests.get(url).text"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 26,
+   "id": "a0b58905-a4e1-42a6-9d8f-16b8856b57b3",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "soup = BeautifulSoup(html_data)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 27,
+   "id": "9ee21578-0500-4450-b4a4-7f866714a5ee",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "AttributeError",
+     "evalue": "'DataFrame' object has no attribute 'append'",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[0;31mAttributeError\u001b[0m                            Traceback (most recent call last)",
+      "\u001b[0;32m/tmp/ipykernel_622/3067321045.py\u001b[0m in \u001b[0;36m?\u001b[0;34m()\u001b[0m\n\u001b[1;32m      4\u001b[0m     \u001b[0mcol\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mrow\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mfind_all\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"td\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      5\u001b[0m     \u001b[0mdate\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mcol\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;36m0\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mtext\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      6\u001b[0m     \u001b[0mRevenue\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mcol\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mtext\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      7\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 8\u001b[0;31m     \u001b[0mgme_revenue\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mgme_revenue\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mappend\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m{\u001b[0m\u001b[0;34m\"Date\"\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0mdate\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m\"Revenue\"\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0mRevenue\u001b[0m\u001b[0;34m}\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mignore_index\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;32mTrue\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      9\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     10\u001b[0m     \u001b[0mgme_revenue\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;34m\"Revenue\"\u001b[0m\u001b[0;34m]\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mgme_revenue\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;34m'Revenue'\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mstr\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mreplace\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m',|\\$'\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\"\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     11\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m/opt/conda/lib/python3.12/site-packages/pandas/core/generic.py\u001b[0m in \u001b[0;36m?\u001b[0;34m(self, name)\u001b[0m\n\u001b[1;32m   6317\u001b[0m             \u001b[0;32mand\u001b[0m \u001b[0mname\u001b[0m \u001b[0;32mnot\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_accessors\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   6318\u001b[0m             \u001b[0;32mand\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_info_axis\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_can_hold_identifiers_and_holds_name\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mname\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   6319\u001b[0m         \u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   6320\u001b[0m             \u001b[0;32mreturn\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0mname\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 6321\u001b[0;31m         \u001b[0;32mreturn\u001b[0m \u001b[0mobject\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m__getattribute__\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mname\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m",
+      "\u001b[0;31mAttributeError\u001b[0m: 'DataFrame' object has no attribute 'append'"
+     ]
+    }
+   ],
+   "source": [
+    "gme_revenue = pd.DataFrame(columns=[\"Date\", \"Revenue\"])\n",
+    "\n",
+    "for row in soup.find(\"tbody\").find_all('tr'):\n",
+    "    col = row.find_all(\"td\")\n",
+    "    date = col[0].text\n",
+    "    Revenue = col[1].text\n",
+    "    \n",
+    "    gme_revenue = gme_revenue.append({\"Date\":date, \"Revenue\":Revenue}, ignore_index=True)   \n",
+    "    \n",
+    "    gme_revenue[\"Revenue\"] = gme_revenue['Revenue'].str.replace(',|\\$',\"\")\n",
+    "    \n",
+    "gme_revenue.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "id": "746d9ac6-98fe-4103-aa22-390bc1100e41",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Date</th>\n",
+       "      <th>Revenue</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "Empty DataFrame\n",
+       "Columns: [Date, Revenue]\n",
+       "Index: []"
+      ]
+     },
+     "execution_count": 28,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "gme_revenue.tail()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 29,
+   "id": "137ac167-e756-4f69-a1ee-e343e7867bad",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "AttributeError",
+     "evalue": "'DataFrame' object has no attribute 'Date'",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[0;31mAttributeError\u001b[0m                            Traceback (most recent call last)",
+      "\u001b[0;32m/tmp/ipykernel_622/2792294465.py\u001b[0m in \u001b[0;36m?\u001b[0;34m()\u001b[0m\n\u001b[0;32m----> 1\u001b[0;31m \u001b[0mmake_graph\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mtesla_data\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mtesla_revenue\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m\"Tesla\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m",
+      "\u001b[0;32m/tmp/ipykernel_622/109047474.py\u001b[0m in \u001b[0;36m?\u001b[0;34m(stock_data, revenue_data, stock)\u001b[0m\n\u001b[1;32m      1\u001b[0m \u001b[0;32mdef\u001b[0m \u001b[0mmake_graph\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mstock_data\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mrevenue_data\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mstock\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      2\u001b[0m     \u001b[0mfig\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mmake_subplots\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mrows\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m2\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcols\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mshared_xaxes\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;32mTrue\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0msubplot_titles\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"Historical Share Price\"\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m\"Historical Revenue\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mvertical_spacing\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;36m.3\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 3\u001b[0;31m     \u001b[0mstock_data_specific\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mstock_data\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0mstock_data\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mDate\u001b[0m \u001b[0;34m<=\u001b[0m \u001b[0;34m'2021-06-14'\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      4\u001b[0m     \u001b[0mrevenue_data_specific\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mrevenue_data\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0mrevenue_data\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mDate\u001b[0m \u001b[0;34m<=\u001b[0m \u001b[0;34m'2021-04-30'\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      5\u001b[0m     \u001b[0mfig\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0madd_trace\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mgo\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mScatter\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mx\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mpd\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mto_datetime\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mstock_data_specific\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mDate\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0minfer_datetime_format\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;32mTrue\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0my\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mstock_data_specific\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mClose\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mastype\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"float\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mname\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;34m\"Share Price\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mrow\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcol\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      6\u001b[0m     \u001b[0mfig\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0madd_trace\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mgo\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mScatter\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mx\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mpd\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mto_datetime\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mrevenue_data_specific\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mDate\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0minfer_datetime_format\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;32mTrue\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0my\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mrevenue_data_specific\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mRevenue\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mastype\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"float\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mname\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;34m\"Revenue\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mrow\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m2\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcol\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m/opt/conda/lib/python3.12/site-packages/pandas/core/generic.py\u001b[0m in \u001b[0;36m?\u001b[0;34m(self, name)\u001b[0m\n\u001b[1;32m   6317\u001b[0m             \u001b[0;32mand\u001b[0m \u001b[0mname\u001b[0m \u001b[0;32mnot\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_accessors\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   6318\u001b[0m             \u001b[0;32mand\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_info_axis\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_can_hold_identifiers_and_holds_name\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mname\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   6319\u001b[0m         \u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   6320\u001b[0m             \u001b[0;32mreturn\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0mname\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 6321\u001b[0;31m         \u001b[0;32mreturn\u001b[0m \u001b[0mobject\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m__getattribute__\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mname\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m",
+      "\u001b[0;31mAttributeError\u001b[0m: 'DataFrame' object has no attribute 'Date'"
+     ]
+    }
+   ],
+   "source": [
+    "make_graph(tesla_data, tesla_revenue, \"Tesla\")\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 31,
+   "id": "bdb06121-1589-4e1e-b4bc-824b98b49ecb",
+   "metadata": {},
+   "outputs": [
+    {
+     "ename": "AttributeError",
+     "evalue": "'DataFrame' object has no attribute 'Date'",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[0;31mAttributeError\u001b[0m                            Traceback (most recent call last)",
+      "\u001b[0;32m/tmp/ipykernel_622/2043305817.py\u001b[0m in \u001b[0;36m?\u001b[0;34m()\u001b[0m\n\u001b[0;32m----> 1\u001b[0;31m \u001b[0mmake_graph\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mgme_data\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mgme_revenue\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m'GameStop'\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m",
+      "\u001b[0;32m/tmp/ipykernel_622/109047474.py\u001b[0m in \u001b[0;36m?\u001b[0;34m(stock_data, revenue_data, stock)\u001b[0m\n\u001b[1;32m      1\u001b[0m \u001b[0;32mdef\u001b[0m \u001b[0mmake_graph\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mstock_data\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mrevenue_data\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mstock\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      2\u001b[0m     \u001b[0mfig\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mmake_subplots\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mrows\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m2\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcols\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mshared_xaxes\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;32mTrue\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0msubplot_titles\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"Historical Share Price\"\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;34m\"Historical Revenue\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mvertical_spacing\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;36m.3\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 3\u001b[0;31m     \u001b[0mstock_data_specific\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mstock_data\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0mstock_data\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mDate\u001b[0m \u001b[0;34m<=\u001b[0m \u001b[0;34m'2021-06-14'\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      4\u001b[0m     \u001b[0mrevenue_data_specific\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mrevenue_data\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0mrevenue_data\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mDate\u001b[0m \u001b[0;34m<=\u001b[0m \u001b[0;34m'2021-04-30'\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      5\u001b[0m     \u001b[0mfig\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0madd_trace\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mgo\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mScatter\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mx\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mpd\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mto_datetime\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mstock_data_specific\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mDate\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0minfer_datetime_format\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;32mTrue\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0my\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mstock_data_specific\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mClose\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mastype\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"float\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mname\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;34m\"Share Price\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mrow\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcol\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      6\u001b[0m     \u001b[0mfig\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0madd_trace\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mgo\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mScatter\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mx\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mpd\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mto_datetime\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mrevenue_data_specific\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mDate\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0minfer_datetime_format\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;32mTrue\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0my\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mrevenue_data_specific\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mRevenue\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mastype\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"float\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mname\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;34m\"Revenue\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mrow\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m2\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mcol\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;32m/opt/conda/lib/python3.12/site-packages/pandas/core/generic.py\u001b[0m in \u001b[0;36m?\u001b[0;34m(self, name)\u001b[0m\n\u001b[1;32m   6317\u001b[0m             \u001b[0;32mand\u001b[0m \u001b[0mname\u001b[0m \u001b[0;32mnot\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_accessors\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   6318\u001b[0m             \u001b[0;32mand\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_info_axis\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_can_hold_identifiers_and_holds_name\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mname\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   6319\u001b[0m         \u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   6320\u001b[0m             \u001b[0;32mreturn\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0mname\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 6321\u001b[0;31m         \u001b[0;32mreturn\u001b[0m \u001b[0mobject\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m__getattribute__\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mname\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m",
+      "\u001b[0;31mAttributeError\u001b[0m: 'DataFrame' object has no attribute 'Date'"
+     ]
+    }
+   ],
+   "source": [
+    "make_graph(gme_data, gme_revenue,'GameStop')\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "a2977992-c4e1-4212-8e4c-8bcf82b419f8",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.12.8"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
